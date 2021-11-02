@@ -1,50 +1,40 @@
 import express from 'express';
-import { read } from './json_arw.js';
+import { read, add } from './json_arw.js';
 
 const app = express();
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
 app.use(express.urlencoded({ extended: false }));
 
-const getRecipePage = (request, response) => {
+const goHome = (request, response) => {
   read('data.json', (err, data) => {
-    const recipeObj = data.recipes[request.params.index];
+    const sightingsArr = data.sightings;
     if (err) {
       response.status(404).send("Git outta here, there's no such page!");
     }
-
-    if (recipeObj === undefined) {
-      response.status(404).send("Git outta here, there's no such page!");
-    } else {
-      response.render('single_recipe', { recipeObj });
-    }
+    response.render('home', { sightingsArr });
   });
 };
 
-const home = (request, response) => {
-  read('data.json', (err, data) => {
-    const recipesArr = data.recipes;
+const submitSighting = (request, response) => {
+  response.render('submit_form');
+};
+
+app.post('/sighted', (request, response) => {
+  console.log('The request body is', request.body);
+  // Add new recipe data in request.body to recipes array in data.json.
+  add('data.json', 'sightings', request.body, (err) => {
+    console.log('The request body within add() is', request.body);
     if (err) {
-      response.status(404).send("Git outta here, there's no such page!");
+      response.status(500).send('DB write error.');
+      return;
     }
 
-    // const catArr = recipesArr.map((obj) => {
-    //   if (obj.category == undefined) {
-    //     return "Uncategorised";
-    //   } else {
-    //     return obj.category;
-    //   }
-    // });
-
-    // const catArrNoDups = [...new Set(catArr)]
-
-    // console.log(catArrNoDups);
-    // why must recipesArr be passed object??
-    response.render('index', { recipesArr });
+    response.send('Saved sightings!');
   });
-};
+});
 
-app.get('/', home);
-app.get('/recipe/:index', getRecipePage);
+app.get('/sighted', submitSighting);
+app.get('/', goHome);
 
 app.listen(3004);

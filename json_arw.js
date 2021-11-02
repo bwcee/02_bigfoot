@@ -52,6 +52,8 @@ function edit(filename, func1InEdit, func2InEdit) {
   });
 }
 
+// 'data.json', 'sightings', request.body, (err)
+
 function add(filename, key, input, callPrintFunc) {
   edit(
     filename,
@@ -71,7 +73,6 @@ function add(filename, key, input, callPrintFunc) {
         callPrintFunc('Key does not exist');
         return;
       }
-
       // Add input element to target array
       jsonContentObj[key].push(input);
     },
