@@ -20,17 +20,26 @@ const submitSighting = (request, response) => {
   response.render('submit_form');
 };
 
+// const showNewSightings = (request, response) => {
+//   read('data.json', (err, data) => {
+//     const sightingsArr = data.sightings;
+//     if (err) {
+//       response.status(404).send("Git outta here, there's no such page!");
+//     }
+//     response.render('home', { sightingsArr });
+//   });
+// };
+
 app.post('/sighted', (request, response) => {
-  console.log('The request body is', request.body);
   // Add new recipe data in request.body to recipes array in data.json.
-  add('data.json', 'sightings', request.body, (err) => {
-    console.log('The request body within add() is', request.body);
+  const newSighting = request.body;
+  add('data.json', 'sightings', newSighting, (err) => {
     if (err) {
       response.status(500).send('DB write error.');
       return;
     }
-
-    response.send('Saved sightings!');
+    console.log('The request body in add() is', newSighting);
+    response.redirect(301, '/');
   });
 });
 
